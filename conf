@@ -1,0 +1,886 @@
+! saved at 2023-10-11 05:30:01
+! model: ZyWALL USG 20
+! firmware version: 3.30(BDQ.7)
+!
+hardware-watchdog-timer 10
+!
+software-watchdog-timer 300
+!
+interface-name ge1 wan1
+interface-name ge2 lan1
+interface-name ge3 lan2
+interface-name ge4 dmz
+!
+username admin encrypted-password $4$Blyl9i0G$+WwmKjikzWXVH9QV3suuzy8ClyBKxPAyeyakNPrbUjqYQX8I+eEnPLfAFX+aaW+g24/4V6dgaWisoq2z9/9Dx6A966mEy4YnE/BZKOW6KjI$ user-type admin
+!
+port-grouping lan1
+ port 2
+ port 3
+ port 4
+ port 5
+!
+port-grouping lan2
+!
+port-grouping dmz
+!
+account pppoe WAN1_PPPoE_ACCOUNT
+!
+ip dhcp pool LAN2_POOL
+ network 192.168.2.0/24
+ default-router 192.168.2.1
+ first-dns-server ZyWALL
+ starting-address 192.168.2.33 pool-size 200
+ lease 2
+!
+ip dhcp pool DMZ_POOL
+ network 192.168.3.0/24
+ default-router 192.168.3.1
+ starting-address 192.168.3.33 pool-size 200
+ first-dns-server ZyWALL
+ lease 2
+!
+ip dhcp pool Network_Pool_LAN1
+ network 10.44.8.200 255.255.255.248
+ default-router 10.44.8.201
+ starting-address 10.44.8.202 pool-size 5
+ first-dns-server 10.230.4.230
+ lease infinite
+!
+interface wan1
+ ip address 10.44.8.114 255.255.255.252
+ type external
+ ip gateway 10.44.8.113 metric 2
+ upstream 1048576
+ downstream 1048576
+ mtu 1400
+ ip rip send version 2
+ ip rip receive version 2
+ ip rip v2-broadcast
+!
+interface lan1
+ ip address 10.44.8.201 255.255.255.248
+ type internal
+ upstream 1048576
+ downstream 1048576
+ mtu 1500
+ ip rip send version 2
+ ip rip receive version 2
+ ip rip v2-broadcast
+ ip dhcp-pool Network_Pool_LAN1
+!
+interface lan2
+ ip address 192.168.2.1 255.255.255.0
+ ip dhcp-pool LAN2_POOL
+ type internal
+ shutdown
+!
+interface dmz
+ ip address 192.168.3.1 255.255.255.0
+ ip dhcp-pool DMZ_POOL
+ type internal
+ shutdown
+!
+interface wan1_ppp
+ shutdown
+ account WAN1_PPPoE_ACCOUNT
+!
+address-object LAN_SVETL 10.44.8.200/29
+address-object ALL 0.0.0.0/0
+address-object LAN_GOM42 10.44.232.0/24
+address-object CORPSRV 192.168.29.11
+address-object MinskWANNew 10.1.40.96/29
+address-object TerminalsMinskNew 10.230.4.0/24
+address-object LAN_GOM24 10.44.230.0/24
+address-object SIP_Phone 10.44.8.204
+address-object dr_admin 10.44.230.10
+address-object minsk_post_ip 10.1.40.98
+address-object bft_ip1 10.44.10.2
+address-object bft_ip2 10.44.10.3
+address-object gom24_wan_ip 10.44.2.222
+address-object svetl_gw_wan_ip 10.44.8.113
+address-object gom24_kes_serv_ip 10.44.230.7
+address-object BAD_ADD 93.184.221.240
+address-object why_1 10.44.10.2
+address-object why_2 10.44.10.5
+address-object INET_PERMIT 10.44.8.203
+address-object HOST1 10.44.8.206
+address-object HOST2 10.44.8.205
+address-object DOSTUP_INTERNET 10.44.8.205
+address-object ATS_NET 192.168.40.0/24
+!
+object-group address WAN_ZYWALL
+ address-object bft_ip1
+ address-object bft_ip2
+ address-object minsk_post_ip
+ address-object gom24_wan_ip
+ address-object svetl_gw_wan_ip
+!
+object-group address why
+ address-object why_1
+ address-object why_2
+!
+object-group address HER_INET
+ address-object HOST1
+ address-object HOST2
+ address-object DOSTUP_INTERNET
+!
+service-object Any_UDP udp range 1 65535
+service-object Any_TCP tcp range 1 65535
+service-object AH protocol 51
+service-object AIM tcp eq 5190
+service-object NEW_ICQ tcp eq 5190
+service-object AUTH tcp eq 113
+service-object BGP tcp eq 179
+service-object BOOTP_CLIENT udp eq 68
+service-object BOOTP_SERVER udp eq 67
+service-object CU_SEEME_TCP1 tcp eq 7648
+service-object CU_SEEME_TCP2 tcp eq 24032
+service-object CU_SEEME_UDP1 udp eq 7648
+service-object CU_SEEME_UDP2 udp eq 24032
+service-object DNS_TCP tcp eq 53
+service-object DNS_UDP udp eq 53
+service-object ESP protocol 50
+service-object FINGER tcp eq 79
+service-object FTP tcp range 20 21
+service-object GRE protocol 47
+service-object H323 tcp eq 1720
+service-object HTTP tcp eq 80
+service-object HTTPS tcp eq 443
+service-object ICQ udp eq 4000
+service-object IKE udp eq 500
+service-object IMAP4 tcp eq 143
+service-object IMAP4S tcp eq 993
+service-object IRC_TCP tcp eq 6667
+service-object IRC_UDP udp eq 6667
+service-object MSN tcp eq 1863
+service-object MULTICAST protocol 2
+service-object NEWS tcp eq 144
+service-object NetBIOS_TCP1 tcp range 137 139
+service-object NetBIOS_TCP2 tcp eq 445
+service-object NetBIOS_UDP1 udp range 137 139
+service-object NetBIOS_UDP2 udp eq 445
+service-object NFS udp eq 2049
+service-object NNTP tcp eq 119
+service-object PING icmp echo
+service-object POP3 tcp eq 110
+service-object POP3S tcp eq 995
+service-object PPTP tcp eq 1723
+service-object PPTP_TUNNEL protocol 47
+service-object RCMD tcp eq 512
+service-object REAL-AUDIO tcp eq 7070
+service-object REXEC tcp eq 514
+service-object RLOGIN tcp eq 513
+service-object ROADRUNNER_TCP tcp eq 1026
+service-object ROADRUNNER_UDP udp eq 1026
+service-object RTELNET tcp eq 107
+service-object RTSP_TCP tcp eq 554
+service-object RTSP_UDP udp eq 554
+service-object SFTP tcp eq 115
+service-object SMTP tcp eq 25
+service-object SMTPS tcp eq 465
+service-object SNMP_TCP tcp eq 161
+service-object SNMP_UDP udp eq 161
+service-object SNMP-TRAPS_TCP tcp eq 162
+service-object SNMP-TRAPS_UDP udp eq 162
+service-object SQL-NET tcp eq 1521
+service-object SSDP udp eq 1900
+service-object SSH_TCP tcp eq 22
+service-object SSH_UDP udp eq 22
+service-object STRMWORKS udp eq 1558
+service-object SYSLOG udp eq 514
+service-object TACACS udp eq 49
+service-object TELNET tcp eq 23
+service-object TFTP udp eq 69
+service-object VDOLIVE tcp eq 7000
+service-object VRRP protocol 112
+service-object NATT udp eq 4500
+service-object RIP udp eq 520
+service-object OSPF protocol 89
+service-object SIP udp eq 5060
+service-object ICMPv6_RS icmpv6 router-solicitation
+service-object ICMPv6_RA icmpv6 router-advertisement
+service-object ICMPv6_NS icmpv6 neighbor-solicitation
+service-object ICMPv6_NA icmpv6 neighbor-advertisement
+service-object ICMPv6_MLD_Query icmpv6 130
+service-object ICMPv6_MLD_Report icmpv6 131
+service-object ICMPv6_MLD_Done icmpv6 132
+service-object ICMPv6_MLD_v2 icmpv6 143
+service-object DHCPv6_CLIENT udp eq 546
+service-object DHCPv6_SERVER udp eq 547
+!
+object-group service CU-SEEME
+ service-object CU_SEEME_TCP1
+ service-object CU_SEEME_TCP2
+ service-object CU_SEEME_UDP1
+ service-object CU_SEEME_UDP2
+!
+object-group service DNS
+ service-object DNS_TCP
+ service-object DNS_UDP
+!
+object-group service IRC
+ service-object IRC_TCP
+ service-object IRC_UDP
+!
+object-group service NetBIOS
+ service-object NetBIOS_TCP1
+ service-object NetBIOS_TCP2
+ service-object NetBIOS_UDP1
+ service-object NetBIOS_UDP2
+!
+object-group service ROADRUNNER
+ service-object ROADRUNNER_TCP
+ service-object ROADRUNNER_UDP
+!
+object-group service RTSP
+ service-object RTSP_TCP
+ service-object RTSP_UDP
+!
+object-group service SNMP
+ service-object SNMP_TCP
+ service-object SNMP_UDP
+!
+object-group service SNMP-TRAPS
+ service-object SNMP-TRAPS_TCP
+ service-object SNMP-TRAPS_UDP
+!
+object-group service SSH
+ service-object SSH_TCP
+ service-object SSH_UDP
+!
+object-group service Default_Allow_WAN_To_ZyWALL
+ description System Default Allow From WAN To ZyWALL
+ service-object AH
+ service-object ESP
+ service-object HTTPS
+ service-object IKE
+ service-object NATT
+ service-object GRE
+ service-object VRRP
+!
+object-group service Default_Allow_DMZ_To_ZyWALL
+ description System Default Allow From DMZ To ZyWALL
+ object-group DNS
+ object-group NetBIOS
+!
+object-group service INTERNET
+ service-object DNS_TCP
+ service-object DNS_UDP
+ service-object FTP
+ service-object HTTP
+ service-object HTTPS
+ service-object PING
+!
+object-group service Default_Allow_ICMPv6_Group
+ description Default Allow icmpv6 to ZyWALL
+ service-object ICMPv6_MLD_Done
+ service-object ICMPv6_MLD_Query
+ service-object ICMPv6_MLD_Report
+ service-object ICMPv6_MLD_v2
+ service-object ICMPv6_NA
+ service-object ICMPv6_NS
+ service-object ICMPv6_RA
+ service-object ICMPv6_RS
+!
+object-group service Default_Allow_v6_WAN_To_ZyWALL
+ service-object AH
+ service-object ESP
+ service-object HTTPS
+ service-object IKE
+ service-object VRRP
+ service-object GRE
+ description System Default Allow IPv6 Form WAN To ZyWALL
+!
+object-group service Default_Allow_v6_DMZ_To_ZyWALL
+ description System Default Allow IPv6 From DMZ to ZyWALL
+ object-group DNS
+ object-group NetBIOS
+!
+object-group service DHCPv6
+ service-object DHCPv6_CLIENT
+ service-object DHCPv6_SERVER
+!
+object-group service Default_Allow_v6_any_to_ZyWALL
+ description System Default Allow IPv6 From any To ZyWALL
+ object-group Default_Allow_ICMPv6_Group
+!
+isakmp policy GW_MINSK
+ activate
+ local-ip interface wan1
+ peer-ip 10.1.40.98 0.0.0.0
+ authentication pre-share
+ encrypted-keystring $4$kVfW2Nvq$sPcZ7OzN+EnjtkCV5nQALVzgg2p4Xky6geoKUXuevnuwo58F5kWtcJcU9xW1habgghDpwmqrhUV7Y0tSn61NilrpgxoxMVF1gwKEXqMEEi4$
+ local-id type ip 10.44.8.114
+ peer-id type ip 10.1.40.98
+ lifetime 36000
+ mode main
+ group1
+ transform-set des-md5
+ xauth type server default deactivate
+ no natt
+!
+isakmp policy GW_GOM24
+ activate
+ local-ip interface wan1
+ peer-ip 10.44.2.222 0.0.0.0
+ authentication pre-share
+ encrypted-keystring $4$rbjSSOEJ$tcZS4i36IOKgJomN2MD7o1GZUP244sJ9DFK6i810vYCwNefm0BCUwXVHs86udFY2CvomCAgDjo4XRUrUzE1qTrI8iQC/1WOnteJNaXH/PyM$
+ local-id type ip 0.0.0.0
+ peer-id type any
+ fall-back-check-interval 300
+ lifetime 86400
+ mode main
+ group2
+ transform-set des-md5
+ xauth type server default deactivate
+!
+isakmp policy Default_L2TP_VPN_GW
+ deactivate
+ local-ip interface wan1
+ peer-ip 0.0.0.0 0.0.0.0
+ authentication pre-share
+ encrypted-keystring $4$cavOLtpo$IKgIc7a+pF9Lu8zjo4XWFg6XVOK/px2Qegq1P8EwE9VnWs4ZoUmLvLKMRwo+aY5Kn43PKdZRHWtEBf+7OodOj9CVK2I+qIyTlUXI+ytTVPo$
+ local-id type ip 0.0.0.0
+ peer-id type any
+ fall-back-check-interval 300
+ lifetime 86400
+ mode main
+ group2
+ transform-set 3des-md5 3des-sha des-sha
+ xauth type server default deactivate
+!
+isakmp policy GW_ATS
+ activate
+ local-ip interface wan1
+ peer-ip 10.1.40.100 0.0.0.0
+ authentication pre-share
+ encrypted-keystring $4$pvfvwunW$k0Oe1OL3ysCbt9Sor6czUV6vabMTSVfpYwFfnjGvfHYDjPBMSqiiGnLNDo2ynlYCzOZY77uVr4EIwTG+as8Vlx4IHTaOEctUGlZNrTyf1wQ$
+ local-id type ip 10.44.8.114
+ peer-id type ip 10.1.40.100
+ fall-back-check-interval 300
+ lifetime 36000
+ mode main
+ group1
+ no natt
+ transform-set des-md5
+ xauth type server default deactivate
+!
+crypto map TUN_MINSK
+ adjust-mss auto
+ activate
+ ipsec-isakmp GW_MINSK
+ scenario site-to-site-static
+ nail-up
+ encapsulation tunnel
+ transform-set esp-des-md5
+ set security-association lifetime seconds 36000
+ set pfs group1
+ local-policy LAN_SVETL
+ remote-policy ALL
+ no conn-check activate
+!
+crypto map TUN_GOM24
+ adjust-mss auto
+ deactivate
+ ipsec-isakmp GW_GOM24
+ scenario site-to-site-static
+ encapsulation tunnel
+ transform-set esp-des-md5
+ set security-association lifetime seconds 86400
+ set pfs none
+ local-policy LAN_SVETL
+ remote-policy LAN_GOM24
+ no conn-check activate
+!
+crypto map Default_L2TP_VPN_Connection
+ adjust-mss auto
+ deactivate
+ ipsec-isakmp Default_L2TP_VPN_GW
+ scenario site-to-site-dynamic
+ encapsulation transport
+ transform-set esp-3des-sha esp-3des-md5 esp-des-sha
+ set security-association lifetime seconds 86400
+ set pfs none
+ no conn-check activate
+!
+crypto map TUN_ATS
+ adjust-mss auto
+ activate
+ ipsec-isakmp GW_ATS
+ scenario site-to-site-static
+ nail-up
+ encapsulation tunnel
+ transform-set esp-des-md5
+ set security-association lifetime seconds 36000
+ set pfs none
+ local-policy LAN_SVETL
+ remote-policy ATS_NET
+ no conn-check activate
+!
+ip route 0.0.0.0 0.0.0.0 10.44.8.113 3
+!
+router rip
+ network wan1
+ network lan1
+!
+zone LAN1
+ interface lan1
+!
+zone LAN2
+ interface lan2
+!
+zone WAN
+ interface wan1
+ interface wan1_ppp
+!
+zone DMZ
+ interface dmz
+ block
+!
+zone SSL_VPN
+ block
+!
+zone IPSec_VPN
+ block
+!
+zone VPN_MINSK
+ crypto TUN_MINSK
+ crypto TUN_ATS
+!
+zone VPN_GOM24
+ crypto TUN_GOM24
+!
+ip http server
+!
+ip http secure-server cert default
+ip http secure-server
+ip http secure-server force-redirect
+!
+hostname zywall-usg-20Svetl
+!
+ip telnet server
+!
+ip ssh server cert default
+ip ssh server
+!
+console baud 115200
+!
+ip ftp server cert default
+!
+clock time-zone +03
+ntp server 0.pool.ntp.org
+!
+snmp-server
+!
+report
+!
+ip load-balancing link-sticking activate
+!
+firewall 1
+ from LAN1
+ to VPN_MINSK
+ sourceip LAN_SVETL
+ destinationip ATS_NET
+ log
+ action allow
+!
+firewall 2
+ from VPN_MINSK
+ to LAN1
+ sourceip ATS_NET
+ destinationip LAN_SVETL
+ log
+ action allow
+!
+firewall 3
+ from LAN1
+ to VPN_MINSK
+ sourceip HER_INET
+ action deny
+ log
+!
+firewall 4
+ from LAN1
+ to VPN_MINSK
+ sourceip INET_PERMIT
+ log
+ action allow
+!
+firewall 5
+ from WAN
+ to ZyWALL
+ sourceip MinskWANNew
+ action allow
+!
+firewall 6
+ from LAN1
+ destinationip BAD_ADD
+ action deny
+!
+firewall 7
+ from LAN1
+ to WAN
+ sourceip SIP_Phone
+ action allow
+!
+firewall 8
+ from WAN
+ to LAN1
+ destinationip SIP_Phone
+ action allow
+!
+firewall 9
+ from LAN1
+ to WAN
+ sourceip HER_INET
+ destinationip TerminalsMinskNew
+ log
+ action allow
+!
+firewall 10
+ from LAN1
+ to VPN_MINSK
+ action allow
+!
+firewall 11
+ from VPN_MINSK
+ to LAN1
+ action allow
+!
+firewall 12
+ from VPN_MINSK
+ to ZyWALL
+ action allow
+ log
+!
+firewall 13
+ from LAN1
+ to ZyWALL
+ action allow
+ log
+!
+firewall 14
+ from WAN
+ to ZyWALL
+ log
+ action allow
+!
+firewall 15
+ from LAN1
+ to WAN
+ sourceip LAN_SVETL
+ destinationip MinskWANNew
+ action allow
+ log
+!
+firewall 16
+ from LAN1
+ to WAN
+ sourceip LAN_SVETL
+ destinationip TerminalsMinskNew
+ action allow
+!
+firewall 17
+ from WAN
+ to LAN1
+ sourceip MinskWANNew
+ destinationip LAN_SVETL
+ action allow
+ log
+!
+firewall 18
+ from WAN
+ to LAN1
+ sourceip TerminalsMinskNew
+ destinationip LAN_SVETL
+ action allow
+!
+firewall 19
+ from LAN1
+ to VPN_GOM24
+ sourceip LAN_SVETL
+ destinationip LAN_GOM24
+ action allow
+ no activate
+!
+firewall 20
+ from VPN_GOM24
+ to LAN1
+ sourceip gom24_kes_serv_ip
+ destinationip LAN_SVETL
+ log
+ action allow
+ no activate
+!
+firewall 21
+ from VPN_GOM24
+ to LAN1
+ sourceip LAN_GOM24
+ destinationip LAN_SVETL
+ action allow
+ log
+ no activate
+!
+firewall 22
+ from VPN_GOM24
+ to ZyWALL
+ action allow
+ log
+ no activate
+!
+firewall 23
+ from LAN1
+ to WAN
+ sourceip LAN_SVETL
+ destinationip LAN_GOM42
+ action allow
+ no activate
+!
+firewall 24
+ from WAN
+ to ZyWALL
+ action allow
+ log
+ sourceip WAN_ZYWALL
+ no activate
+!
+firewall 25
+ from LAN1
+ to WAN
+ sourceip LAN_SVETL
+ destinationip LAN_GOM24
+ action allow
+ log
+ no activate
+!
+firewall 26
+ from WAN
+ to LAN1
+ sourceip LAN_GOM24
+ destinationip LAN_SVETL
+ action allow
+ log
+ no activate
+!
+firewall 27
+ from WAN
+ to LAN1
+ sourceip LAN_GOM42
+ destinationip LAN_SVETL
+ action allow
+ no activate
+!
+firewall default-rule action deny log
+!
+firewall6 1
+ to ZyWALL
+ service Default_Allow_v6_any_to_ZyWALL
+ action allow
+!
+firewall6 2
+ from LAN1
+ action allow
+!
+firewall6 3
+ from LAN2
+ action allow
+!
+firewall6 4
+ from DMZ
+ to WAN
+ action allow
+!
+firewall6 5
+ from IPSec_VPN
+ action allow
+!
+firewall6 6
+ from SSL_VPN
+ action allow
+!
+firewall6 7
+ from TUNNEL
+ action allow
+!
+firewall6 8
+ from LAN1
+ to ZyWALL
+ action allow
+!
+firewall6 9
+ from LAN2
+ to ZyWALL
+ action allow
+!
+firewall6 10
+ from DMZ
+ to ZyWALL
+ service Default_Allow_v6_DMZ_To_ZyWALL
+ action allow
+!
+firewall6 11
+ from WAN
+ to ZyWALL
+ service Default_Allow_v6_WAN_To_ZyWALL
+ action allow
+!
+firewall6 12
+ from IPSec_VPN
+ to ZyWALL
+ action allow
+!
+firewall6 13
+ from SSL_VPN
+ to ZyWALL
+ action allow
+!
+firewall6 14
+ from TUNNEL
+ to ZyWALL
+ action allow
+!
+firewall6 default-rule action deny log
+!
+idp anomaly activate
+!
+idp anomaly ADP_PROFILE base all
+ flood-detection tcp-flood block
+ flood-detection udp-flood block
+ flood-detection icmp-flood block
+ flood-detection ip-flood block
+ flood-detection icmp-flood threshold 350
+ flood-detection ip-flood threshold 350
+ flood-detection tcp-flood threshold 350
+ flood-detection udp-flood threshold 350
+ scan-detection sensitivity medium
+ scan-detection block-period 5
+ flood-detection block-period 5
+!
+idp anomaly rule 1
+ from-zone any
+ to-zone LAN1
+ bind ADP_PROFILE
+ activate
+!
+idp anomaly rule 2
+ from-zone any
+ to-zone LAN2
+ bind ADP_PROFILE
+ activate
+!
+idp anomaly rule 3
+ from-zone any
+ to-zone DMZ
+ bind ADP_PROFILE
+ activate
+!
+idp anomaly rule 4
+ from-zone any
+ to-zone ZyWALL
+ bind ADP_PROFILE
+ activate
+!
+no bwm activate
+!
+policy controll-ipsec-dynamic-rules activate
+!
+policy 1
+ interface lan1
+ source LAN_SVETL
+ dscp any
+ destination ATS_NET
+ next-hop tunnel TUN_ATS
+!
+policy 2
+ interface lan1
+ source LAN_SVETL
+ dscp any
+ destination TerminalsMinskNew
+ next-hop interface wan1
+!
+policy 3
+ interface lan1
+ source LAN_SVETL
+ dscp any
+ destination MinskWANNew
+ next-hop interface wan1
+!
+policy 4
+ interface lan1
+ source LAN_SVETL
+ dscp any
+ next-hop tunnel TUN_MINSK
+!
+policy 5
+ tunnel TUN_MINSK
+ dscp any
+ destination LAN_SVETL
+ next-hop interface lan1
+!
+policy 6
+ deactivate
+ interface lan1
+ source LAN_SVETL
+ dscp any
+ destination LAN_GOM24
+ next-hop tunnel TUN_GOM24
+!
+policy 7
+ description DNS
+ interface lan1
+ source LAN_SVETL
+ dscp any
+ destination CORPSRV
+ service DNS
+ next-hop tunnel TUN_MINSK
+!
+policy 8
+ description int
+ interface lan1
+ source HER_INET
+ dscp any
+ service INTERNET
+ next-hop tunnel TUN_MINSK
+!
+app SMTP defaultport 25
+!
+app POP3 defaultport 110
+!
+app HTTP defaultport 80
+app HTTP defaultport 8080
+app HTTP defaultport 3128
+!
+alg h323 transformation
+!
+no alg ftp
+!
+users retry-limit
+users retry-count 5
+users lockout-period 30
+!
+users update-lease automation
+!
+app-watch-dog activate
+!
+htm phase 1 add all
+!
+force-auth exceptional-service DNS
+!
+force-auth default-rule authentication unnecessary no log
+!
+schedule-run 1 reboot02.zysh daily 05:30
+!
+logging system-log suppression
+logging system-log category default level normal
+logging system-log category forward-web-sites level normal
+!
+logging mail 1 category all level all
+!
+logging mail 2 category all level all
+!
+logging mail 2
+!
+vrpt send interface statistics interval 15
+vrpt send system status interval 15
+vrpt send device information interval 3600
+!
