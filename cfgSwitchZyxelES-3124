@@ -1,0 +1,66 @@
+; Product Name = ES-3124
+; Firmware Version = V3.80(TP.3) | 6/17/2011
+; SysConf Engine Version = 1.1
+vlan 1 
+  name 1 
+  normal "" 
+  fixed 7-8,10-19,21-27 
+  forbidden 1-6,9,20,28 
+  untagged 1-25,27-28 
+exit
+vlan 21 
+  name UBITKI_LAN 
+  normal "" 
+  fixed 26,28 
+  forbidden 1-25,27 
+  untagged 1-25,27 
+exit
+vlan 111 
+  name management 
+  normal "" 
+  fixed 26,28 
+  forbidden 1-25,27 
+  untagged 1-25,27 
+  ip address inband-default 192.168.111.18 255.255.255.0 
+  ip address default-gateway 192.168.111.1 
+exit
+vlan 120 
+  name USER_LAN 
+  normal "" 
+  fixed 1-6,9,20,28 
+  forbidden 7-8,10-19,21-27 
+  untagged 1-27 
+exit
+interface port-channel 1 
+  pvid 120 
+exit
+interface port-channel 2 
+  pvid 120 
+exit
+interface port-channel 3 
+  pvid 120 
+exit
+interface port-channel 4 
+  pvid 120 
+exit
+interface port-channel 5 
+  pvid 120 
+exit
+interface port-channel 6 
+  pvid 120 
+exit
+interface port-channel 9 
+  pvid 120 
+exit
+interface port-channel 20 
+  pvid 120 
+exit
+interface port-channel 28 
+  pvid 21 
+exit
+ip name-server 192.168.29.11 
+ip address 192.168.0.1 255.255.255.0 
+timesync server 192.168.29.11 
+timesync ntp 
+snmp-server get-community BNSZZ 
+snmp-server set-community BNSZZ 
